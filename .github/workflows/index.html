@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuestFlow - Gamified Productivity</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">QuestFlow</p>
+          <h1>Turn real life into a daily quest.</h1>
+          <p class="subhead">Earn XP, keep your streak alive, and defeat monsters by finishing what matters.</p>
+        </div>
+        <div class="hero-card">
+          <div class="stat">
+            <span>XP</span>
+            <strong id="xpValue">0</strong>
+          </div>
+          <div class="stat">
+            <span>Level</span>
+            <strong id="levelValue">1</strong>
+          </div>
+          <div class="stat">
+            <span>Streak</span>
+            <strong id="streakValue">0</strong>
+          </div>
+          <div class="stat">
+            <span>Monster</span>
+            <strong id="monsterValue">-</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="grid">
+        <div class="card" id="searchCard">
+          <div class="card-header">
+            <div>
+              <h2>Search & Filters</h2>
+              <p>Find tasks or dailies by title, tags, or status.</p>
+            </div>
+            <button class="btn ghost" id="clearFiltersBtn">Clear</button>
+          </div>
+          <div class="filters">
+            <label class="field">
+              <span>Search</span>
+              <input id="searchInput" type="text" placeholder="Search quests or routines..." />
+            </label>
+            <div class="filter-row">
+              <label class="field">
+                <span>Type</span>
+                <select id="filterType">
+                  <option value="all">All</option>
+                  <option value="task">Tasks</option>
+                  <option value="daily">Dailies</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Status</span>
+                <select id="filterStatus">
+                  <option value="all">All</option>
+                  <option value="complete">Completed</option>
+                  <option value="incomplete">Incomplete</option>
+                </select>
+              </label>
+            </div>
+            <div class="field">
+              <span>Tags (any)</span>
+              <div id="filterTags" class="tag-chips"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="tasksCard">
+          <div class="card-header">
+            <div>
+              <h2>To-Do Quests</h2>
+              <p>Complete a task to earn XP and hit the monster.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn ghost" id="importHabiticaBtn">Import Habitica</button>
+              <button class="btn" id="addTaskBtn">New Task</button>
+            </div>
+          </div>
+          <ul id="tasksList" class="list"></ul>
+        </div>
+
+        <div class="card" id="routineCard">
+          <div class="card-header">
+            <div>
+              <h2>Daily Routine</h2>
+              <p>Reusable checklists that can boost XP and streaks.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn ghost" id="importTimeblockBtn">Import TimeBlock</button>
+              <button class="btn" id="addRoutineBtn">Add Item</button>
+            </div>
+          </div>
+          <ul id="routineList" class="list"></ul>
+        </div>
+
+        <div class="card" id="tagsCard">
+          <div class="card-header">
+            <div>
+              <h2>Tags</h2>
+              <p>Create reusable tags for quests and routines.</p>
+            </div>
+            <button class="btn" id="addTagBtn">New Tag</button>
+          </div>
+          <ul id="tagsList" class="list"></ul>
+        </div>
+
+        <div class="card" id="pomodoroCard">
+          <div class="card-header">
+            <div>
+              <h2>Pomodoro</h2>
+              <p>20 minutes focus, 5 minutes break. Repeat the cycle.</p>
+            </div>
+          </div>
+          <div class="pomodoro">
+            <div>
+              <div id="timerLabel" class="timer-label">Focus</div>
+              <div id="timerDisplay" class="timer">20:00</div>
+            </div>
+            <div class="pomodoro-controls">
+              <button class="btn primary" id="startPauseBtn">Start</button>
+              <button class="btn ghost" id="resetBtn">Reset</button>
+              <button class="btn ghost" id="skipBtn">Skip</button>
+            </div>
+            <div id="timerNote" class="timer-note">Stay locked in for 20 minutes.</div>
+          </div>
+        </div>
+
+        <div class="card" id="monsterCard">
+          <div class="card-header">
+            <div>
+              <h2>Monsters</h2>
+              <p>Every completed task deals damage. Defeat them to level up the challenge.</p>
+            </div>
+          </div>
+          <div class="monster">
+            <div class="monster-battle">
+              <img
+                id="monsterBattleImage"
+                class="monster-battle-image"
+                src="assets/monsters/placeholder-monster.svg"
+                alt="Monster"
+                decoding="async"
+              />
+            </div>
+            <div class="monster-meta">
+              <div class="monster-identity">
+                <img
+                  id="monsterImage"
+                  class="monster-avatar"
+                  src="assets/monsters/placeholder-monster.svg"
+                  alt="Monster"
+                  decoding="async"
+                />
+                <div class="monster-title">
+                  <h3 id="monsterName">-</h3>
+                  <span id="monsterLevel">Level 1</span>
+                </div>
+              </div>
+              <div class="monster-controls">
+                <input
+                  id="monsterImageInput"
+                  class="hidden"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                />
+                <button class="btn ghost" id="monsterImageBtn" type="button">Change image</button>
+                <button class="btn ghost" id="monsterImageResetBtn" type="button">Reset</button>
+              </div>
+            </div>
+            <div class="hp-bar">
+              <div id="monsterHpFill" class="hp-fill"></div>
+            </div>
+            <div class="monster-stats">
+              <span id="monsterHpText">0 / 0 HP</span>
+              <span id="monsterState">Awaiting battle</span>
+            </div>
+            <div id="monsterLog" class="monster-log"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="modal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="modalTitle">New Task</h3>
+        <label>
+          <span>Title</span>
+          <input id="modalInput" type="text" placeholder="Write your quest..." />
+        </label>
+        <div id="routineToggles" class="toggle-group hidden">
+          <label class="toggle">
+            <input type="checkbox" id="routineXpToggle" checked />
+            <span>Grant XP</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="routineStreakToggle" checked />
+            <span>Count toward streak</span>
+          </label>
+        </div>
+        <div class="tag-selector">
+          <span class="helper">Tags</span>
+          <div id="tagOptions" class="tag-options"></div>
+          <p id="tagEmptyState" class="helper hidden">No tags yet. Create one in the Tags panel.</p>
+        </div>
+        <div class="modal-actions">
+          <button class="btn ghost" id="cancelModalBtn">Cancel</button>
+          <button class="btn primary" id="saveModalBtn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="importModal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="importTitle">Import</h3>
+        <div id="habiticaFields" class="import-section">
+          <label>
+            <span>Habitica User ID</span>
+            <input id="habiticaUserId" type="text" placeholder="UUID from Habitica settings" />
+          </label>
+          <label>
+            <span>Habitica API Token</span>
+            <input id="habiticaApiToken" type="password" placeholder="Your API token" />
+          </label>
+          <label>
+            <span>X-Client Header</span>
+            <input id="habiticaClient" type="text" placeholder="UserId-QuestFlow" />
+          </label>
+          <div class="toggle-group">
+            <label class="toggle">
+              <input type="checkbox" id="habiticaTodosToggle" checked />
+              <span>Import Todos</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="habiticaDailiesToggle" />
+              <span>Import Dailies</span>
+            </label>
+          </div>
+          <p class="helper">We only import incomplete tasks. Your credentials stay in this browser.</p>
+        </div>
+        <div id="timeblockFields" class="import-section hidden">
+          <label>
+            <span>Paste TimeBlock Export (JSON or CSV)</span>
+            <textarea id="timeblockInput" rows="6" placeholder="title,start,end,day"></textarea>
+          </label>
+          <label class="file-label">
+            <span>Or choose a file</span>
+            <input id="timeblockFile" type="file" accept=".json,.csv,.txt" />
+          </label>
+          <div class="toggle-group">
+            <label class="toggle">
+              <input type="checkbox" id="timeblockXpToggle" checked />
+              <span>Grant XP</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="timeblockStreakToggle" checked />
+              <span>Count toward streak</span>
+            </label>
+          </div>
+          <p class="helper">JSON can be an array or {\"blocks\": []}. CSV headers can include title, start, end, day.</p>
+        </div>
+        <div id="importStatus" class="import-status"></div>
+        <div class="modal-actions">
+          <button class="btn ghost" id="cancelImportBtn">Cancel</button>
+          <button class="btn primary" id="confirmImportBtn">Import</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tagModal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="tagModalTitle">New Tag</h3>
+        <label>
+          <span>Tag name</span>
+          <input id="tagNameInput" type="text" placeholder="Focus, Admin, Wellness..." />
+        </label>
+        <div class="modal-actions">
+          <button class="btn ghost" id="cancelTagBtn">Cancel</button>
+          <button class="btn primary" id="saveTagBtn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
